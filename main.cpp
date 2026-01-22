@@ -26,6 +26,35 @@ const std::string square_to_coordinate[] = {
 
 // clang-format on
 
+unsigned int state = 1804289383;
+
+unsigned int get_random_U32_number() {
+  unsigned int number = state;
+
+  number ^= number << 13;
+  number ^= number >> 17;
+  number ^= number << 5;
+
+  state = number;
+  return state;
+}
+
+U64 get_random_U64_number() {
+  U64 n1, n2, n3, n4;
+
+  n1 = (U64)(get_random_U32_number() & 0xFFFF);
+  n2 = (U64)(get_random_U32_number() & 0xFFFF);
+  n3 = (U64)(get_random_U32_number() & 0xFFFF);
+  n4 = (U64)(get_random_U32_number() & 0xFFFF);
+
+  return n1 | (n2 << 16) | (n3 << 32) | (n4 << 48);
+}
+
+U64 generate_magic_number() {
+  return get_random_U64_number() & get_random_U64_number() &
+         get_random_U64_number();
+}
+
 // set/get/pop macros
 #define set_bit(bitboard, square) (bitboard |= (1ULL << square))
 #define pop_bit(bitboard, square)                                              \
@@ -372,29 +401,15 @@ U64 set_occupancy(int index, int bits_in_mask, U64 attack_map) {
 
   return occupancy;
 }
-
-unsigned int state = 1804289383;
-
-unsigned int get_random_number() {
-  unsigned int number = state;
-
-  number ^= number << 13;
-  number ^= number >> 17;
-  number ^= number << 5;
-
-  state = number;
-  return state;
-}
 int main() {
 
   // init_leapers_attacks();
 
   // std::cout << random();
-  std::cout << get_random_number() << std::endl;
-  std::cout << get_random_number() << std::endl;
-  std::cout << get_random_number() << std::endl;
-  std::cout << get_random_number() << std::endl;
-  std::cout << get_random_number() << std::endl;
 
+  print_bitboard((U64)get_random_U32_number());
+  print_bitboard((U64)get_random_U32_number() & 0xFFFF);
+  print_bitboard(get_random_U64_number());
+  print_bitboard(generate_magic_number());
   return 0;
 }
