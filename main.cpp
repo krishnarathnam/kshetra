@@ -127,6 +127,20 @@ const U64 not_h_file = 9187201950435737471ULL;
 const U64 not_hg_file = 4557430888798830399ULL;
 const U64 not_ab_file = 18229723555195321596ULL;
 
+// relevant occupacy bit count for every square on board
+const int bishop_relevant_bits[64] = {
+    6, 5, 5, 5, 5, 5, 5, 6, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 7, 7, 7, 7,
+    5, 5, 5, 5, 7, 9, 9, 7, 5, 5, 5, 5, 7, 9, 9, 7, 5, 5, 5, 5, 7, 7,
+    7, 7, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 5, 5, 5, 5, 5, 5, 6,
+};
+
+const int rook_relevant_bits[64] = {
+    12, 11, 11, 11, 11, 11, 11, 12, 11, 10, 10, 10, 10, 10, 10, 11,
+    11, 10, 10, 10, 10, 10, 10, 11, 11, 10, 10, 10, 10, 10, 10, 11,
+    11, 10, 10, 10, 10, 10, 10, 11, 11, 10, 10, 10, 10, 10, 10, 11,
+    11, 10, 10, 10, 10, 10, 10, 11, 12, 11, 11, 11, 11, 11, 11, 12,
+};
+
 // pawn attacks table [side to move][attack availbale in current given square]
 U64 pawn_attacks[2][64];
 U64 knight_attacks[64];
@@ -336,22 +350,51 @@ U64 rook_attacks_on_the_fly(int square, U64 block) {
 void init_leapers_attacks() {
   for (int square = 0; square < 64; square++) {
     king_attacks[square] = mask_king_attacks(square);
+    pawn_attacks[white][square] = mask_pawn_attacks(square, white);
+    pawn_attacks[black][square] = mask_pawn_attacks(square, black);
+    knight_attacks[square] = mask_knight_attacks(square);
   }
 }
 
+// ocuupancy
+U64 set_occupancy(int index, int bits_in_mask, U64 attack_map) {
+  U64 occupancy = 0ULL;
+
+  for (int count = 0; count < bits_in_mask; count++) {
+    // get lsb index of attack mask
+    int square = get_lsb_index(attack_map);
+    // pop lsb index in attack map
+    pop_bit(attack_map, square);
+    // pop lsb index in attack map
+    if (index & (1 << count))
+      occupancy |= (1ULL << square);
+  }
+
+  return occupancy;
+}
+
+unsigned int state = 1804289383;
+
+unsigned int get_random_number() {
+  unsigned int number = state;
+
+  number ^= number << 13;
+  number ^= number >> 17;
+  number ^= number << 5;
+
+  state = number;
+  return state;
+}
 int main() {
 
   // init_leapers_attacks();
-  U64 block = 0ULL;
-  set_bit(block, d6);
-  set_bit(block, a4);
-  set_bit(block, f4);
-  set_bit(block, e4);
-  set_bit(block, g5);
-  print_bitboard(block);
-  std::cout << "LSB: " << get_lsb_index(block)
-            << " Coordinate: " << square_to_coordinate[get_lsb_index(block)]
-            << std::endl;
+
+  // std::cout << random();
+  std::cout << get_random_number() << std::endl;
+  std::cout << get_random_number() << std::endl;
+  std::cout << get_random_number() << std::endl;
+  std::cout << get_random_number() << std::endl;
+  std::cout << get_random_number() << std::endl;
 
   return 0;
 }
