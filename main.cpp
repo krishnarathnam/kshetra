@@ -26,17 +26,17 @@ const std::string square_to_coordinate[] = {
 
 // clang-format on
 
-unsigned int state = 1804289383;
+unsigned int random_state = 1804289383;
 
 unsigned int get_random_U32_number() {
-  unsigned int number = state;
+  unsigned int number = random_state;
 
   number ^= number << 13;
   number ^= number >> 17;
   number ^= number << 5;
 
-  state = number;
-  return state;
+  random_state = number;
+  return random_state;
 }
 
 U64 get_random_U64_number() {
